@@ -40,6 +40,7 @@ lq_ak$establishment <- "lq"
 
 dn_lq_ak1 <- 
   full_join(dn_ak, lq_ak, by = join_by(address, city, state, zip, longitude, latitude, establishment))
+#I did this before I see your notes. My way of joining the two data frames allows the same variables for two locations, while your way of joining datasets allows for pairing and later including distance information into the joined dataset.
 ```
 
 ```{r dn1-distance}
@@ -54,6 +55,7 @@ dn2_lq2 <- sqrt((dn_lq_ak1$longitude[2] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1
 #dn3
 dn3_lq1 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[4])^2)
 dn3_lq2 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[5])^2)
+#I only noticed your notes after I typed in all these. I didn't want to delete it so here they are. They are not used for later calculations or visualizations.
 ```
 There are six pairings. 
 
@@ -213,12 +215,14 @@ dn_lq_tx %>%
   geom_point(mapping = aes(
     x = longitude.x,
     y = latitude.x,
-    color = establishment.x
+    color = establishment.x, 
+    alpha = .5
     )) +
   geom_point(mapping = aes(
     x = longitude.y,
     y = latitude.y,
-    color = establishment.y
+    color = establishment.y, 
+    alpha = .5
     )) +
   labs(
   title = "Danny's and La Quinta Locations",
@@ -226,15 +230,66 @@ dn_lq_tx %>%
   x = "Longitude of establishements", 
   y = "Latitude of establishements", 
   color = "Establishment"
-     )
+     ) +
+  guides(alpha = FALSE)
 ```
-
 
 ### Exercise 11
 
+```{r ca}
+#filter out CA
+dn_ca <- dennys %>%
+  filter(state == "CA")
+
+lq_ca <- laquinta %>%
+  filter(state == "CA")
+
+#join the data frames
+dn_ca$establishment <- "dn"
+lq_ca$establishment <- "lq"
+
+dn_lq_ca <- full_join(dn_ca, lq_ca, 
+                      by = "state")
+dn_lq_ca
+
+#calculate distances for all pairings 
+dn_lq_ca$distance <- haversine(dn_lq_ca$longitude.x, dn_lq_ca$latitude.x, dn_lq_ca$longitude.y, dn_lq_ca$latitude.y, round = 3)
+
+#find the minimum distance
+dn_lq_ca_mindist <- dn_lq_ca %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+#visualize the shortest distances
+dn_lq_ca %>%
+  filter(dn_lq_ca$distance %in% dn_lq_ca_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x,
+    alpha = .5
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y,
+    alpha = .5
+    )) +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in California",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     ) +
+  guides(alpha = FALSE)
+```
+
+
 ### Exercise 12
 
-
+Mitch Hedberg's joke about La Quinta is the Spanish for next for Denny's is true for most state except for North Carolina, where there are two La Quinta's that is still pretty far from the nearest Denny's. It is worth noting that it is generally true that if you find a La Quinta location, there is a Denny's near it, but this joke doesn't garantee that if you find a Denny's location, a La Quinta's location is necessarily nearby.
 
 
 

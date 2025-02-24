@@ -119,13 +119,19 @@ dn_lq_ak_mindist <- dn_lq_ak %>%
 ### Exercise 8
 
 ``` r
-dn_lq_ak1 %>%
-  ggplot(mapping = aes(
-    x = longitude,
-    y = latitude,
-    color = establishment
+dn_lq_ak %>%
+  filter(dn_lq_ak$distance %in% dn_lq_ak_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x
     )) +
-  geom_point() +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y
+    )) +
   labs(
   title = "Danny's and La Quinta Locations",
   subtitle = "in Alaska",
@@ -135,6 +141,267 @@ dn_lq_ak1 %>%
      )
 ```
 
-![](lab-05_files/figure-gfm/ak-vis-1.png)<!-- --> As shown in the graph,
-in Alaska, La Quinta locations are all near Denny’s. The distance
-between the nearest Denny’s and La Quinta are 5.197, 2.035, 5.998.
+![](lab-05_files/figure-gfm/ak-vis-1.png)<!-- -->
+
+As shown in the graph, in Alaska, La Quinta locations are all near
+Denny’s. The distance between the nearest Denny’s and La Quinta are
+5.197, 2.035, 5.998.
+
+### Exercise 9
+
+``` r
+#filter out NC
+dn_nc <- dennys %>%
+  filter(state == "NC")
+
+lq_nc <- laquinta %>%
+  filter(state == "NC")
+
+#join the data frames
+dn_nc$establishment <- "dn"
+lq_nc$establishment <- "lq"
+
+dn_lq_nc <- full_join(dn_nc, lq_nc, 
+                      by = "state")
+```
+
+    ## Warning in full_join(dn_nc, lq_nc, by = "state"): Detected an unexpected many-to-many relationship between `x` and `y`.
+    ## ℹ Row 1 of `x` matches multiple rows in `y`.
+    ## ℹ Row 1 of `y` matches multiple rows in `x`.
+    ## ℹ If a many-to-many relationship is expected, set `relationship =
+    ##   "many-to-many"` to silence this warning.
+
+``` r
+dn_lq_nc
+```
+
+    ## # A tibble: 336 × 13
+    ##    address.x city.x state zip.x longitude.x latitude.x establishment.x address.y
+    ##    <chr>     <chr>  <chr> <chr>       <dbl>      <dbl> <chr>           <chr>    
+    ##  1 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              165 Hwy …
+    ##  2 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              3127 Slo…
+    ##  3 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              4900 Sou…
+    ##  4 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              4414 Dur…
+    ##  5 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              1910 Wes…
+    ##  6 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              1201 Lan…
+    ##  7 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              1607 Fai…
+    ##  8 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              191 Cres…
+    ##  9 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              2211 Sum…
+    ## 10 1 Regent… Ashev… NC    28806       -82.6       35.6 dn              1001 Aer…
+    ## # ℹ 326 more rows
+    ## # ℹ 5 more variables: city.y <chr>, zip.y <chr>, longitude.y <dbl>,
+    ## #   latitude.y <dbl>, establishment.y <chr>
+
+``` r
+#calculate distances for all pairings 
+dn_lq_nc$distance <- haversine(dn_lq_nc$longitude.x, dn_lq_nc$latitude.x, dn_lq_nc$longitude.y, dn_lq_nc$latitude.y, round = 3)
+
+#find the minimum distance
+dn_lq_nc_mindist <- dn_lq_nc %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+#visualize the shortest distances
+dn_lq_nc %>%
+  filter(dn_lq_nc$distance %in% dn_lq_nc_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y
+    )) +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in North Carolina",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     )
+```
+
+![](lab-05_files/figure-gfm/nc-1.png)<!-- -->
+
+### Exercise 10
+
+``` r
+#filter out TX
+dn_tx <- dennys %>%
+  filter(state == "TX")
+
+lq_tx <- laquinta %>%
+  filter(state == "TX")
+
+#join the data frames
+dn_tx$establishment <- "dn"
+lq_tx$establishment <- "lq"
+
+dn_lq_tx <- full_join(dn_tx, lq_tx, 
+                      by = "state")
+```
+
+    ## Warning in full_join(dn_tx, lq_tx, by = "state"): Detected an unexpected many-to-many relationship between `x` and `y`.
+    ## ℹ Row 1 of `x` matches multiple rows in `y`.
+    ## ℹ Row 1 of `y` matches multiple rows in `x`.
+    ## ℹ If a many-to-many relationship is expected, set `relationship =
+    ##   "many-to-many"` to silence this warning.
+
+``` r
+dn_lq_tx
+```
+
+    ## # A tibble: 47,400 × 13
+    ##    address.x city.x state zip.x longitude.x latitude.x establishment.x address.y
+    ##    <chr>     <chr>  <chr> <chr>       <dbl>      <dbl> <chr>           <chr>    
+    ##  1 120 East… Abile… TX    79601       -99.6       32.4 dn              3018 Cat…
+    ##  2 120 East… Abile… TX    79601       -99.6       32.4 dn              3501 Wes…
+    ##  3 120 East… Abile… TX    79601       -99.6       32.4 dn              14925 La…
+    ##  4 120 East… Abile… TX    79601       -99.6       32.4 dn              909 East…
+    ##  5 120 East… Abile… TX    79601       -99.6       32.4 dn              2400 Eas…
+    ##  6 120 East… Abile… TX    79601       -99.6       32.4 dn              1220 Nor…
+    ##  7 120 East… Abile… TX    79601       -99.6       32.4 dn              1165 Hwy…
+    ##  8 120 East… Abile… TX    79601       -99.6       32.4 dn              880 Sout…
+    ##  9 120 East… Abile… TX    79601       -99.6       32.4 dn              1708 Int…
+    ## 10 120 East… Abile… TX    79601       -99.6       32.4 dn              9305 Eas…
+    ## # ℹ 47,390 more rows
+    ## # ℹ 5 more variables: city.y <chr>, zip.y <chr>, longitude.y <dbl>,
+    ## #   latitude.y <dbl>, establishment.y <chr>
+
+``` r
+#calculate distances for all pairings 
+dn_lq_tx$distance <- haversine(dn_lq_tx$longitude.x, dn_lq_tx$latitude.x, dn_lq_tx$longitude.y, dn_lq_tx$latitude.y, round = 3)
+
+#find the minimum distance
+dn_lq_tx_mindist <- dn_lq_tx %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+#visualize the shortest distances
+dn_lq_tx %>%
+  filter(dn_lq_tx$distance %in% dn_lq_tx_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x, 
+    alpha = .5
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y, 
+    alpha = .5
+    )) +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in Texas",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     ) +
+  guides(alpha = FALSE)
+```
+
+    ## Warning: The `<scale>` argument of `guides()` cannot be `FALSE`. Use "none" instead as
+    ## of ggplot2 3.3.4.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+![](lab-05_files/figure-gfm/tx-1.png)<!-- -->
+
+### Exercise 11
+
+``` r
+#filter out CA
+dn_ca <- dennys %>%
+  filter(state == "CA")
+
+lq_ca <- laquinta %>%
+  filter(state == "CA")
+
+#join the data frames
+dn_ca$establishment <- "dn"
+lq_ca$establishment <- "lq"
+
+dn_lq_ca <- full_join(dn_ca, lq_ca, 
+                      by = "state")
+```
+
+    ## Warning in full_join(dn_ca, lq_ca, by = "state"): Detected an unexpected many-to-many relationship between `x` and `y`.
+    ## ℹ Row 1 of `x` matches multiple rows in `y`.
+    ## ℹ Row 1 of `y` matches multiple rows in `x`.
+    ## ℹ If a many-to-many relationship is expected, set `relationship =
+    ##   "many-to-many"` to silence this warning.
+
+``` r
+dn_lq_ca
+```
+
+    ## # A tibble: 22,568 × 13
+    ##    address.x city.x state zip.x longitude.x latitude.x establishment.x address.y
+    ##    <chr>     <chr>  <chr> <chr>       <dbl>      <dbl> <chr>           <chr>    
+    ##  1 14240 Us… Adela… CA    92301       -117.       34.5 dn              1752 Cle…
+    ##  2 14240 Us… Adela… CA    92301       -117.       34.5 dn              8858 Spe…
+    ##  3 14240 Us… Adela… CA    92301       -117.       34.5 dn              3232 Riv…
+    ##  4 14240 Us… Adela… CA    92301       -117.       34.5 dn              920 Univ…
+    ##  5 14240 Us… Adela… CA    92301       -117.       34.5 dn              3 Center…
+    ##  6 14240 Us… Adela… CA    92301       -117.       34.5 dn              1771 Res…
+    ##  7 14240 Us… Adela… CA    92301       -117.       34.5 dn              6275 Dub…
+    ##  8 14240 Us… Adela… CA    92301       -117.       34.5 dn              316 Pitt…
+    ##  9 14240 Us… Adela… CA    92301       -117.       34.5 dn              190 N. 1…
+    ## 10 14240 Us… Adela… CA    92301       -117.       34.5 dn              46200 La…
+    ## # ℹ 22,558 more rows
+    ## # ℹ 5 more variables: city.y <chr>, zip.y <chr>, longitude.y <dbl>,
+    ## #   latitude.y <dbl>, establishment.y <chr>
+
+``` r
+#calculate distances for all pairings 
+dn_lq_ca$distance <- haversine(dn_lq_ca$longitude.x, dn_lq_ca$latitude.x, dn_lq_ca$longitude.y, dn_lq_ca$latitude.y, round = 3)
+
+#find the minimum distance
+dn_lq_ca_mindist <- dn_lq_ca %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+#visualize the shortest distances
+dn_lq_ca %>%
+  filter(dn_lq_ca$distance %in% dn_lq_ca_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x,
+    alpha = .5
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y,
+    alpha = .5
+    )) +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in California",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     ) +
+  guides(alpha = FALSE)
+```
+
+![](lab-05_files/figure-gfm/ca-1.png)<!-- -->
+
+### Exercise 12
+
+Mitch Hedberg’s joke about La Quinta is the Spanish for next for Denny’s
+is true for most states except for North Carolina, where there are two
+La Quinta’s that is still pretty far from the nearest Denny’s. It is
+worth noting that it is generally true that if you find a La Quinta
+location, there is a Denny’s near it, but this joke doesn’t garantee
+that if you find a Denny’s location, a La Quinta’s location is
+necessarily nearby.
