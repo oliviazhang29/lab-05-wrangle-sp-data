@@ -18,17 +18,29 @@ states <- read_csv("data/states.csv")
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r filter-dn-ak}
+dn_ak <- dennys %>%
+  filter(state == "AK")
+nrow(dn_ak)
+```
+There are `r nrow(dn_ak)` Denny’s locations in Alaska.
+
+```{r filter-lq-ak}
+lq_ak <- laquinta %>%
+  filter(state == "AK")
+nrow(lq_ak)
+```
+There are `r nrow(lq_ak)` La Quinta locations in Alaska.
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r}
+dn_ak$establishment <- "dn"
+lq_ak$establishment <- "lq"
+
+dn_lq_ak <- 
+  full_join(dn_ak, lq_ak, by = join_by(address, city, state, zip, longitude, latitude, establishment))
+```
 
 ### Exercise 3
 
