@@ -42,25 +42,22 @@ There are 2 La Quinta locations in Alaska.
 dn_ak$establishment <- "dn"
 lq_ak$establishment <- "lq"
 
-dn_lq_ak <- 
+dn_lq_ak1 <- 
   full_join(dn_ak, lq_ak, by = join_by(address, city, state, zip, longitude, latitude, establishment))
 ```
 
 ``` r
 #dn1
-dn1_lq1 <- sqrt((dn_lq_ak$longitude[1] - dn_lq_ak$longitude[4])^2 + (dn_lq_ak$latitude[1] - dn_lq_ak$latitude[4])^2)
-
-dn1_lq2 <- sqrt((dn_lq_ak$longitude[1] - dn_lq_ak$longitude[5])^2 + (dn_lq_ak$latitude[1] - dn_lq_ak$latitude[5])^2)
+dn1_lq1 <- sqrt((dn_lq_ak1$longitude[1] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[1] - dn_lq_ak1$latitude[4])^2)
+dn1_lq2 <- sqrt((dn_lq_ak1$longitude[1] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[1] - dn_lq_ak1$latitude[5])^2)
 
 #dn2
-dn2_lq1 <- sqrt((dn_lq_ak$longitude[2] - dn_lq_ak$longitude[4])^2 + (dn_lq_ak$latitude[2] - dn_lq_ak$latitude[4])^2)
-
-dn2_lq2 <- sqrt((dn_lq_ak$longitude[2] - dn_lq_ak$longitude[5])^2 + (dn_lq_ak$latitude[2] - dn_lq_ak$latitude[5])^2)
+dn2_lq1 <- sqrt((dn_lq_ak1$longitude[2] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[2] - dn_lq_ak1$latitude[4])^2)
+dn2_lq2 <- sqrt((dn_lq_ak1$longitude[2] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[2] - dn_lq_ak1$latitude[5])^2)
 
 #dn3
-dn3_lq1 <- sqrt((dn_lq_ak$longitude[3] - dn_lq_ak$longitude[4])^2 + (dn_lq_ak$latitude[3] - dn_lq_ak$latitude[4])^2)
-
-dn3_lq2 <- sqrt((dn_lq_ak$longitude[3] - dn_lq_ak$longitude[5])^2 + (dn_lq_ak$latitude[3] - dn_lq_ak$latitude[5])^2)
+dn3_lq1 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[4])^2)
+dn3_lq2 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[5])^2)
 ```
 
 There are six pairings.
@@ -98,19 +95,46 @@ dn_lq_ak
 
 ### Exercise 4
 
-How many observations are in the joined dn_lq_ak data frame? What are
-the names of the variables in this data frame. …
-
-There are 6 in the joined dn_lq_ak data frame. The names are address.x,
-city.x, state, zip.x, longitude.x, latitude.x, establishment.x,
-address.y, city.y, zip.y, longitude.y, latitude.y, establishment.y
+There are 6 observations in the joined dn_lq_ak data frame. The names
+are address.x, city.x, state, zip.x, longitude.x, latitude.x,
+establishment.x, address.y, city.y, zip.y, longitude.y, latitude.y,
+establishment.y.
 
 ### Exercise 5
 
-…
-
 ### Exercise 6
 
-…
+``` r
+dn_lq_ak$distance <- haversine(dn_lq_ak$longitude.x, dn_lq_ak$latitude.x, dn_lq_ak$longitude.y, dn_lq_ak$latitude.y, round = 3)
+```
 
-Add exercise headings as needed.
+### Exercise 7
+
+``` r
+dn_lq_ak_mindist <- dn_lq_ak %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+```
+
+### Exercise 8
+
+``` r
+dn_lq_ak1 %>%
+  ggplot(mapping = aes(
+    x = longitude,
+    y = latitude,
+    color = establishment
+    )) +
+  geom_point() +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in Alaska",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     )
+```
+
+![](lab-05_files/figure-gfm/ak-vis-1.png)<!-- --> As shown in the graph,
+in Alaska, La Quinta locations are all near Denny’s. The distance
+between the nearest Denny’s and La Quinta are 5.197, 2.035, 5.998.

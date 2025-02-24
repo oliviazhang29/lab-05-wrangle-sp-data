@@ -38,25 +38,22 @@ There are `r nrow(lq_ak)` La Quinta locations in Alaska.
 dn_ak$establishment <- "dn"
 lq_ak$establishment <- "lq"
 
-dn_lq_ak <- 
+dn_lq_ak1 <- 
   full_join(dn_ak, lq_ak, by = join_by(address, city, state, zip, longitude, latitude, establishment))
 ```
 
 ```{r dn1-distance}
 #dn1
-dn1_lq1 <- sqrt((dn_lq_ak$longitude[1] - dn_lq_ak$longitude[4])^2 + (dn_lq_ak$latitude[1] - dn_lq_ak$latitude[4])^2)
-
-dn1_lq2 <- sqrt((dn_lq_ak$longitude[1] - dn_lq_ak$longitude[5])^2 + (dn_lq_ak$latitude[1] - dn_lq_ak$latitude[5])^2)
+dn1_lq1 <- sqrt((dn_lq_ak1$longitude[1] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[1] - dn_lq_ak1$latitude[4])^2)
+dn1_lq2 <- sqrt((dn_lq_ak1$longitude[1] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[1] - dn_lq_ak1$latitude[5])^2)
 
 #dn2
-dn2_lq1 <- sqrt((dn_lq_ak$longitude[2] - dn_lq_ak$longitude[4])^2 + (dn_lq_ak$latitude[2] - dn_lq_ak$latitude[4])^2)
-
-dn2_lq2 <- sqrt((dn_lq_ak$longitude[2] - dn_lq_ak$longitude[5])^2 + (dn_lq_ak$latitude[2] - dn_lq_ak$latitude[5])^2)
+dn2_lq1 <- sqrt((dn_lq_ak1$longitude[2] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[2] - dn_lq_ak1$latitude[4])^2)
+dn2_lq2 <- sqrt((dn_lq_ak1$longitude[2] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[2] - dn_lq_ak1$latitude[5])^2)
 
 #dn3
-dn3_lq1 <- sqrt((dn_lq_ak$longitude[3] - dn_lq_ak$longitude[4])^2 + (dn_lq_ak$latitude[3] - dn_lq_ak$latitude[4])^2)
-
-dn3_lq2 <- sqrt((dn_lq_ak$longitude[3] - dn_lq_ak$longitude[5])^2 + (dn_lq_ak$latitude[3] - dn_lq_ak$latitude[5])^2)
+dn3_lq1 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[4])^2)
+dn3_lq2 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[5])^2)
 ```
 There are six pairings. 
 
@@ -110,19 +107,19 @@ dn_lq_ak_mindist <- dn_lq_ak %>%
 ### Exercise 8
 
 ```{r ak-vis}
-ggplot() +
-  layer(
-    data = dn_lq_ak, mapping = aes(x = latitude.x, 
-                                   y = longitude.x, 
-                                   color = "blue"), 
-    geom = "point", stat = "identity", position = "identity"
-  ) + 
-  layer(
-    data = dn_lq_ak, mapping = aes(x = latitude.y, 
-                                   y = longitude.y, 
-                                   color = "orange"), 
-    geom = "point", stat = "identity", position = "identity"
-  )  +
+dn_lq_ak %>%
+  filter(dn_lq_ak$distance %in% dn_lq_ak_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y
+    )) +
   labs(
   title = "Danny's and La Quinta Locations",
   subtitle = "in Alaska",
@@ -131,14 +128,111 @@ ggplot() +
   color = "Establishment"
      )
 ```
-Describe the distribution of the distances Denny’s and the nearest La Quinta locations in Alaska. Also include an appropriate visualization and relevant summary statistics.
 
-In Alaska, La Quinta locations are all near Denny’s. The distance between the nearest Denny's and La Quinta are `r dn_lq_ak_mindist`.
+As shown in the graph, in Alaska, La Quinta locations are all near Denny’s. The distance between the nearest Denny's and La Quinta are `r dn_lq_ak_mindist$closest`.
+
+### Exercise 9
+
+```{r nc}
+#filter out NC
+dn_nc <- dennys %>%
+  filter(state == "NC")
+
+lq_nc <- laquinta %>%
+  filter(state == "NC")
+
+#join the data frames
+dn_nc$establishment <- "dn"
+lq_nc$establishment <- "lq"
+
+dn_lq_nc <- full_join(dn_nc, lq_nc, 
+                      by = "state")
+dn_lq_nc
+
+#calculate distances for all pairings 
+dn_lq_nc$distance <- haversine(dn_lq_nc$longitude.x, dn_lq_nc$latitude.x, dn_lq_nc$longitude.y, dn_lq_nc$latitude.y, round = 3)
+
+#find the minimum distance
+dn_lq_nc_mindist <- dn_lq_nc %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+#visualize the shortest distances
+dn_lq_nc %>%
+  filter(dn_lq_nc$distance %in% dn_lq_nc_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y
+    )) +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in North Carolina",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     )
+```
+
+### Exercise 10
+
+```{r tx}
+#filter out TX
+dn_tx <- dennys %>%
+  filter(state == "TX")
+
+lq_tx <- laquinta %>%
+  filter(state == "TX")
+
+#join the data frames
+dn_tx$establishment <- "dn"
+lq_tx$establishment <- "lq"
+
+dn_lq_tx <- full_join(dn_tx, lq_tx, 
+                      by = "state")
+dn_lq_tx
+
+#calculate distances for all pairings 
+dn_lq_tx$distance <- haversine(dn_lq_tx$longitude.x, dn_lq_tx$latitude.x, dn_lq_tx$longitude.y, dn_lq_tx$latitude.y, round = 3)
+
+#find the minimum distance
+dn_lq_tx_mindist <- dn_lq_tx %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+#visualize the shortest distances
+dn_lq_tx %>%
+  filter(dn_lq_tx$distance %in% dn_lq_tx_mindist$closest) %>%
+  ggplot() +
+  geom_point(mapping = aes(
+    x = longitude.x,
+    y = latitude.x,
+    color = establishment.x
+    )) +
+  geom_point(mapping = aes(
+    x = longitude.y,
+    y = latitude.y,
+    color = establishment.y
+    )) +
+  labs(
+  title = "Danny's and La Quinta Locations",
+  subtitle = "in Texas",
+  x = "Longitude of establishements", 
+  y = "Latitude of establishements", 
+  color = "Establishment"
+     )
+```
 
 
+### Exercise 11
 
-
-
+### Exercise 12
 
 
 
