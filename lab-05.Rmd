@@ -10,6 +10,7 @@ output: github_document
 ```{r load-packages, message = FALSE}
 library(tidyverse) 
 library(dsbox) 
+library(maps)
 ```
 
 ```{r load-data, message = FALSE}
@@ -128,7 +129,8 @@ dn_lq_ak %>%
   x = "Longitude of establishements", 
   y = "Latitude of establishements", 
   color = "Establishment"
-     )
+     ) 
+# + borders("state", regions = "alaska", colour = "gray50", fill = NA) #there is no region for alaska in the maps database, so I'm commenting it out
 ```
 
 As shown in the graph, in Alaska, La Quinta locations are all near Denny’s. The distance between the nearest Denny's and La Quinta are `r dn_lq_ak_mindist$closest`.
@@ -179,7 +181,8 @@ dn_lq_nc %>%
   x = "Longitude of establishements", 
   y = "Latitude of establishements", 
   color = "Establishment"
-     )
+     ) +
+  borders("state", regions = "north carolina", colour = "gray50", fill = NA)
 ```
 
 ### Exercise 10
@@ -231,7 +234,8 @@ dn_lq_tx %>%
   y = "Latitude of establishements", 
   color = "Establishment"
      ) +
-  guides(alpha = FALSE)
+  guides(alpha = FALSE) +
+  borders("state", regions = "texas", colour = "gray50", fill = NA)
 ```
 
 ### Exercise 11
@@ -283,7 +287,8 @@ dn_lq_ca %>%
   y = "Latitude of establishements", 
   color = "Establishment"
      ) +
-  guides(alpha = FALSE)
+  guides(alpha = FALSE) +
+  borders("state", regions = "california", colour = "gray50", fill = NA)
 ```
 
 

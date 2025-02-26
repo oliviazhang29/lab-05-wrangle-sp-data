@@ -8,6 +8,7 @@ Olivia Zhang
 ``` r
 library(tidyverse) 
 library(dsbox) 
+library(maps)
 ```
 
 ``` r
@@ -44,6 +45,7 @@ lq_ak$establishment <- "lq"
 
 dn_lq_ak1 <- 
   full_join(dn_ak, lq_ak, by = join_by(address, city, state, zip, longitude, latitude, establishment))
+#I did this before I see your notes. My way of joining the two data frames allows the same variables for two locations, while your way of joining datasets allows for pairing and later including distance information into the joined dataset.
 ```
 
 ``` r
@@ -58,6 +60,7 @@ dn2_lq2 <- sqrt((dn_lq_ak1$longitude[2] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1
 #dn3
 dn3_lq1 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[4])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[4])^2)
 dn3_lq2 <- sqrt((dn_lq_ak1$longitude[3] - dn_lq_ak1$longitude[5])^2 + (dn_lq_ak1$latitude[3] - dn_lq_ak1$latitude[5])^2)
+#I only noticed your notes after I typed in all these. I didn't want to delete it so here they are. They are not used for later calculations or visualizations.
 ```
 
 There are six pairings.
@@ -138,10 +141,14 @@ dn_lq_ak %>%
   x = "Longitude of establishements", 
   y = "Latitude of establishements", 
   color = "Establishment"
-     )
+     ) 
 ```
 
 ![](lab-05_files/figure-gfm/ak-vis-1.png)<!-- -->
+
+``` r
+# + borders("state", regions = "alaska", colour = "gray50", fill = NA) #there is no region for alaska in the maps database, so I'm commenting it out
+```
 
 As shown in the graph, in Alaska, La Quinta locations are all near
 Denny’s. The distance between the nearest Denny’s and La Quinta are
@@ -221,7 +228,8 @@ dn_lq_nc %>%
   x = "Longitude of establishements", 
   y = "Latitude of establishements", 
   color = "Establishment"
-     )
+     ) +
+  borders("state", regions = "north carolina", colour = "gray50", fill = NA)
 ```
 
 ![](lab-05_files/figure-gfm/nc-1.png)<!-- -->
@@ -303,7 +311,8 @@ dn_lq_tx %>%
   y = "Latitude of establishements", 
   color = "Establishment"
      ) +
-  guides(alpha = FALSE)
+  guides(alpha = FALSE) +
+  borders("state", regions = "texas", colour = "gray50", fill = NA)
 ```
 
     ## Warning: The `<scale>` argument of `guides()` cannot be `FALSE`. Use "none" instead as
@@ -391,7 +400,8 @@ dn_lq_ca %>%
   y = "Latitude of establishements", 
   color = "Establishment"
      ) +
-  guides(alpha = FALSE)
+  guides(alpha = FALSE) +
+  borders("state", regions = "california", colour = "gray50", fill = NA)
 ```
 
 ![](lab-05_files/figure-gfm/ca-1.png)<!-- -->
@@ -399,9 +409,8 @@ dn_lq_ca %>%
 ### Exercise 12
 
 Mitch Hedberg’s joke about La Quinta is the Spanish for next for Denny’s
-is true for most states except for North Carolina, where there are two
-La Quinta’s that is still pretty far from the nearest Denny’s. It is
-worth noting that it is generally true that if you find a La Quinta
-location, there is a Denny’s near it, but this joke doesn’t garantee
-that if you find a Denny’s location, a La Quinta’s location is
-necessarily nearby.
+is true for most state except for North Carolina, where there are two La
+Quinta’s that is still pretty far from the nearest Denny’s. It is worth
+noting that it is generally true that if you find a La Quinta location,
+there is a Denny’s near it, but this joke doesn’t garantee that if you
+find a Denny’s location, a La Quinta’s location is necessarily nearby.
